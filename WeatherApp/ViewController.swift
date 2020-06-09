@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     }
     
     func getData() {
-        guard let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?zip=94108,us&appid=f40963e13db745094d9c217cd5f38abb") else { return }
+        guard let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?zip=10309,us&appid=f40963e13db745094d9c217cd5f38abb") else { return }
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let data = data, error == nil {
                 do {
@@ -49,18 +49,19 @@ class ViewController: UIViewController {
     
     func setWeather(weather: String?, description: String?, temp: Int) {
         weatherDescriptionLabel.text = description ?? ".."
-        tempLabel.text = "\(temp)"
-        switch weather {
-        case "Sunny":
+        tempLabel.text = "\(temp)°"
+        
+        if weather!.lowercased().contains("sun") || weather!.lowercased().contains("clear") {
             weatherImageView.image = UIImage(named: "sunny")
             background.backgroundColor = UIColor(red: 0.97, green: 0.78, blue: 0.35, alpha: 1.0)
-        case "Rainy":
+        } else if weather!.lowercased().contains("rain") {
             weatherImageView.image = UIImage(named: "rainy")
             background.backgroundColor = UIColor(red: 0.42, green: 0.55, blue: 0.71, alpha: 1.0)
-        default:
+        } else if weather!.lowercased().contains("cloud") {
             weatherImageView.image = UIImage(named: "cloudy")
-            background.backgroundColor = UIColor(red: 0.42, green: 0.55, blue: 0.71, alpha: 1.0)
+            background.backgroundColor = UIColor(red: 0.098, green: 0.5569, blue: 0.0353, alpha: 1.0)
         }
+       
     }
 }
 
