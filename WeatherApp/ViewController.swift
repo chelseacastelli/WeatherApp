@@ -18,21 +18,21 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        
+        getData()
     }
     
     func getData() {
-        guard let url = URL(string: "api.openweathermap.org/data/2.5/weather?zip=10309,us&appid=f40963e13db745094d9c217cd5f38abb") else { return }
+        guard let url = URL(string: "http://api.openweathermap.org/data/2.5/weather?zip=94108,us&appid=f40963e13db745094d9c217cd5f38abb") else { return }
         let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
             if let data = data, error == nil {
                 do {
                     guard let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String : Any] else { return }
                     guard let weatherDetails = json["weather"] as? [[String : Any]], let weatherMain = json["main"] as? [String : Any] else { return }
-                    let temp = Int(weatherMain["temp"] as? Double ?? 0)
+                    let tempKelvin = weatherMain["temp"]
+                    let tempFahrenheit = self.convertToFahrenheit(kelvin: Double(tempKelvin as? Double ?? 0))
                     let description = (weatherDetails.first?["description"] as? String)?.capitalizingFirstLetter()
                     DispatchQueue.main.async {
-                        self.setWeather(weather: weatherDetails.first?["main"] as? String, description: description, temp: temp)
+                        self.setWeather(weather: weatherDetails.first?["main"] as? String, description: description, temp: Int(tempFahrenheit))
                     }
                 } catch {
                     print("We had an error retrieving the weather data...")
@@ -40,6 +40,11 @@ class ViewController: UIViewController {
             }
         }
         task.resume()
+    }
+    
+    func convertToFahrenheit(kelvin: Double) -> Int {
+        let kelTemp = 1.8*(kelvin-273)+32
+        return Int(kelTemp)
     }
     
     func setWeather(weather: String?, description: String?, temp: Int) {
